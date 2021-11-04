@@ -88,15 +88,3 @@ theories/ITrace/EuttDiv.v
 theories/ITrace/TracePrefix.v
 theories/ITrace/ITraceBind.v
 theories/ITrace/ITracePreds.v
-
-theories/Secure/StrongBisimProper.v
-theories/Secure/SecureEqHalt.v
-theories/Secure/SecureEqEuttHalt.v
-theories/Secure/SecureEqEuttTrans.v
-theories/Secure/SecureEqWcompat.v
-theories/Secure/SecureEqBind.v
-
-theories/Secure/SecureEqProgInsens.v
-theories/Secure/SecureEqProgInsensFacts.v
-theories/Secure/SecureStateHandler.v
-theories/Secure/SecureStateHandlerPi.v
