@@ -96,6 +96,7 @@ Polymorphic Class MonadIter (M : Type -> Type) : Type :=
 
     Quite easily in fact, no [Monad] assumption needed.
  *)
+(** I needed to make a change for this to typecheck*)
 
 #[global] Instance MonadIter_stateT {M S} {MM : Monad M} {AM : MonadIter M}
   : MonadIter (stateT S M) :=
@@ -120,6 +121,7 @@ Polymorphic Class MonadIter (M : Type -> Type) : Type :=
           | inl i' => inl (fst si', i')
           | inr r => inr (fst si', r)
           end) (s, i).
+
 
 #[global] Instance MonadIter_readerT {M S} {AM : MonadIter M} : MonadIter (readerT S M) :=
   fun _ _ step i => mkReaderT (fun s =>

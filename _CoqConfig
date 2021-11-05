@@ -27,6 +27,7 @@ theories/Core/KTree.v
 theories/Core/KTreeFacts.v
 theories/Core/Subevent.v
 theories/Core/ITreeMonad.v
+theories/Core/Divergence.v
 
 theories/Eq.v
 theories/Eq/Paco2.v
@@ -60,6 +61,7 @@ theories/Events/StateFacts.v
 theories/Events/Reader.v
 theories/Events/Writer.v
 theories/Events/Exception.v
+theories/Events/ExceptionFacts.v
 theories/Events/Nondeterminism.v
 theories/Events/Map.v
 theories/Events/MapDefault.v
@@ -67,3 +69,11 @@ theories/Events/MapDefaultFacts.v
 theories/Events/Concurrency.v
 theories/Events/Dependent.v
 theories/Events/FailFacts.v
+
+theories/ITrace/EuttEv.v
+theories/ITrace/ITraceDefinition.v
+theories/ITrace/ITraceFacts.v
+theories/ITrace/EuttDiv.v
+theories/ITrace/TracePrefix.v
+theories/ITrace/ITraceBind.v
+theories/ITrace/ITracePreds.v
