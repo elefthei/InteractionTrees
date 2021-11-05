@@ -47,22 +47,6 @@ Proof.
   eauto.
 Qed.
 
-
-Lemma bind_tau : forall (E : Type -> Type) (A B : Type) (t : itree E A) (f : A -> itree E B),
-    ITree.bind (Tau t) f ≅ Tau (ITree.bind t f).
-Proof.
-  intros. pfold. red. cbn. constructor. left. 
-  assert ( (ITree.bind t f) ≅  (ITree.bind t f)); try reflexivity; auto.
-Qed.
-
-Lemma bind_vis : forall (E : Type -> Type) (A B C : Type) (e : E C) (k : C -> itree E A) (f : A -> itree E B),
-    ITree.bind (Vis e k) f ≅ Vis e (fun a => ITree.bind (k a) f). 
-Proof.
-  intros. cbn. pfold. red. cbn. constructor. intros. unfold id. left.
-  assert (ITree.bind (k v) (fun x => f x) ≅ ITree.bind (k v) (fun x => f x)); try reflexivity. 
-  auto.
-Qed.
-
 Lemma div_bind_nop : forall (E : Type -> Type) (A B : Type) (t : itree E A) (f : A -> itree E B),
     must_diverge t -> eutt_div t (t >>= f).
 Proof.
@@ -76,22 +60,6 @@ Proof.
     apply euttG_base. left. apply CIHH. apply H0.
 Qed.   
 
-Lemma eutt_subrel : forall (E : Type -> Type) (A B : Type) (R1 R2 : A -> B -> Prop)
-                           (ta : itree E A) (tb : itree E B),
-    (forall a b, R1 a b -> R2 a b) -> eutt R1 ta tb -> eutt R2 ta tb.
-Proof.
-  intros.
-  eapply eqit_mon; eauto.
-Qed.
-
-Lemma eutt_flip : forall (E : Type -> Type) (A B : Type) (R : A -> B -> Prop)
-                         (ta : itree E A) (tb : itree E B),
-    eutt R ta tb -> eutt (flip R) tb ta.
-Proof.
-  intros. apply eqit_flip. 
-  eapply eutt_subrel with (R1 := R); eauto.
-Qed.
-    
 Lemma eutt_div_subrel : forall (E : Type -> Type) (A B : Type) (R : A -> B -> Prop) 
                                (ta : itree E A) (tb : itree E B), 
     eutt_div ta tb -> eutt R ta tb.
