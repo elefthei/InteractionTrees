@@ -5,8 +5,6 @@ From Coq Require Import
      Morphisms
      Setoid
      RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
      Program.Equality
 .
 
@@ -29,7 +27,7 @@ Import MonadNotation.
 Local Open Scope monad_scope.
 
 
-(** Defines the euttEv relation, an extension of eutt that allows you to choose relate events across different event type families and restrict the values you continue on in the corecursive call based on these events. It is used to define the branch_refine relation.
+(** Defines the euttEv relation, an extension of eutt that allows you to relate events across different event type families and restrict the values you continue on in the corecursive call based on these events. It is used to define the branch_refine relation.
 *)
 Section EuttEvF.
 
@@ -109,10 +107,10 @@ Lemma euttEv_inv_tauR {E1 E2 R1 R2 REv RAns RR} t1 t2 :
   @euttEv E1 E2 R1 R2 REv RAns RR t1 (Tau t2) -> euttEv REv RAns RR t1 t2.
 Proof.
   intros. punfold H. red in H. simpl in *.
-  pstep. red. dependent induction H; subst; auto.
-  - pclearbot. rewrite <- x. constructor.
-    pstep_reverse.
-  - rewrite <- x. constructor. eapply IHeuttEvF; eauto.
+  pstep. red. remember (TauF t2) as tt2 eqn:Ett2 in H.
+  revert t2 Ett2; induction H; try discriminate; intros; inversion Ett2; subst; auto.
+  - pclearbot. constructor. pstep_reverse.
+  - constructor. eapply IHeuttEvF; eauto.
 Qed.
 
 Lemma euttEv_add_tauR {E1 E2 R1 R2 REv RAns RR} t1 t2 :
@@ -124,17 +122,8 @@ Qed.
 Lemma euttEv_inv_tauLR  {E1 E2 R1 R2 REv RAns RR} t1 t2 :
    @euttEv E1 E2 R1 R2 REv RAns RR (Tau t1) (Tau t2) -> euttEv REv RAns RR t1 t2.
 Proof.
-  intros. punfold H. red in H. cbn in H. pstep. red.
-  dependent induction H.
-  - pclearbot. pstep_reverse.
-  - inv H; auto.
-    + pclearbot. constructor. pstep_reverse.
-    + constructor. eapply IHeuttEvF; eauto.
-  - inv H; auto.
-    + pclearbot. constructor. pstep_reverse.
-    + constructor. eapply IHeuttEvF; eauto.
+  intros; apply euttEv_inv_tauR, euttEv_inv_tauL; assumption.
 Qed.
-
 
 Section eqitC_euttEv.
   Context {E1 E2 : Type -> Type} {R1 R2 : Type} (RR : R1 -> R2 -> Prop).
@@ -165,7 +154,6 @@ Section eqitC_euttEv.
   Qed.
 
   Hint Resolve eqitC_euttEv_mon : paco.
-    
 
 End eqitC_euttEv.
 
@@ -180,7 +168,7 @@ Proof.
   constructor; eauto with paco.
   { red. intros. eapply eqitC_euttEv_mon; eauto. }
   intros.
-  dependent destruction PR. punfold EQVl. punfold EQVr. unfold_eqit.
+  destruct PR. punfold EQVl. punfold EQVr. unfold_eqit.
   hinduction REL before r; intros; clear t1' t2'.
   - remember (RetF r1) as x. red.
     hinduction EQVl before r; intros; subst; try inv Heqx; eauto; (try constructor; eauto).
@@ -197,9 +185,11 @@ Proof.
     hinduction EQVr before r; intros; subst; try inv Heqy; try inv CHECK; (try (constructor; eauto; fail)).
     pclearbot. punfold REL. constructor. eapply IHREL; eauto.
   - remember (VisF e1 k1) as x. red.
-    hinduction EQVl before r; intros; subst; try dependent destruction Heqx; try inv CHECK; try (constructor; eauto; fail).
+    hinduction EQVl before r; intros; subst; try discriminate; try (constructor; eauto; fail).
     remember (VisF e2 k3) as y.
-    hinduction EQVr before r; intros; subst; try dependent destruction Heqy; try inv CHECK; try (constructor; eauto; fail).
+    hinduction EQVr before r; intros; subst; try discriminate; try (constructor; eauto; fail).
+    dependent destruction Heqx.
+    dependent destruction Heqy.
     constructor; auto. intros. apply H0 in H1. pclearbot. eapply MON.
     + eapply CMP. red. econstructor; eauto.
     + intros. apply gpaco2_clo; auto.
