@@ -1,23 +1,9 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
      Morphisms
-     Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
-     Program.Equality
-     Logic.IndefiniteDescription
 .
 
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
-
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
      ITrace.EuttEv
@@ -39,7 +25,14 @@ Local Open Scope monad_scope.
    to decompose a trace of bind t f into a head that refines t and a tail
    that refines f *)
 
-Axiom classicT : forall (P : Prop), {P} + {~ P}.
+Lemma classicT : forall (P : Prop), {P} + {~ P}.
+Proof.
+  intros P.
+  assert (H : exists b : bool, if b then P else ~ P).
+  { destruct (classic P); [exists true | exists false]; assumption. }
+  apply constructive_indefinite_description in H.
+  destruct H as [[] ?]; [ left | right ]; assumption.
+Qed.
 
 Definition peel_vis {E R S A B} (e0 : E A) (a : A) (k0 : unit -> itrace E R)
            (e1 : E B) (k1 : B -> itree E S) 
@@ -202,15 +195,15 @@ Proof.
     + rewrite <- x0.
       symmetry in Heq. apply simpobs in Heq. apply simpobs in x.
       rewrite Heq in x. rewrite bind_vis in x. pinversion x.
-      inj_existT. inversion H; inj_existT.
+      ddestruction. inversion H; ddestruction.
       * unfold observe. cbn. unfold peel_vis.
         destruct (classicT (B = B) ); try contradiction.
         unfold eq_rect_r, eq_rect. 
         remember (eq_sym _) as He. clear HeqHe.
         dependent destruction He. cbn. constructor; eauto.
-        intros. inversion H1. inj_existT.
+        intros. inversion H1. ddestruction.
         apply H0 in H1. pclearbot. unfold id. right. eapply CIH.
-        red in x1. cbn in x1. inversion x1. inj_existT.
+        red in x1. cbn in x1. inversion x1. ddestruction.
         red in H0. specialize (H0 tt a (rar _ _ _)).
         specialize (REL0 a). pclearbot.
         rewrite REL0. apply H0.
@@ -587,9 +580,9 @@ Proof.
     try (destruct e; cbn);
     try (constructor; auto; eapply eqitF_mon; eauto; fail).
     + constructor. pclearbot. left. eapply paco2_mon; eauto; intuition.
-    + subst. inj_existT. subst. cbn. constructor. intros. left. inv H0.
-      inj_existT. subst. pclearbot. eapply paco2_mon; eauto; intuition.
-    + inj_existT. subst. inj_existT. subst. cbn. constructor; auto. intuition.
+    + subst. ddestruction. subst. cbn. constructor. intros. left. inv H0.
+      ddestruction. subst. pclearbot. eapply paco2_mon; eauto; intuition.
+    + ddestruction. subst. ddestruction. subst. cbn. constructor; auto. intuition.
       (*looks like I didn't actually need to induct here ... *)
   - dependent induction H0; try clear IHeqitF.
     + rewrite <- x0. rewrite <- x. red. cbn. constructor. right.
@@ -717,7 +710,7 @@ Proof.
   assert (A = A). auto.
   destruct (classicT (A = A) ); try contradiction. unfold eq_rect_r, eq_rect in Hpeel.
   remember (eq_sym e0) as He. dependent destruction He. cbn in *.
-  clear HeqHe e0 H. pfold. red. cbn. inv Hpeel. inj_existT.
+  clear HeqHe e0 H. pfold. red. cbn. inv Hpeel. ddestruction.
   pclearbot. specialize (REL tt).
   assert (peel_ (observe (k1 tt)) (observe (k2 a)) ≈ k3 tt ). auto.
   symmetry in H. punfold H.
@@ -780,12 +773,12 @@ Proof.
       rewrite Heqb in Href. rewrite Heqt in Href.
       rewrite bind_vis in Href.
       punfold Href. red in Href. cbn in *. inv Href.
-      inj_existT. subst. inv H1. auto.
+      ddestruction. subst. inv H1. auto.
     } 
     destruct (classicT (A0 = X0)); try (exfalso; auto; fail).
     unfold eq_rect_r, eq_rect in x. remember (eq_sym e0) as He.
     dependent destruction He. cbn in x. injection x as Hevans.
-    inj_existT. subst. inj_existT. subst. exists k0.
+    ddestruction. subst. ddestruction. subst. exists k0.
     symmetry in Heqb. apply simpobs in Heqb. rewrite Heqb. reflexivity.
   - unfold peel in x. destruct (observe b) eqn : Heqb; destruct (observe t) eqn : Heqt;
                         try destruct e0; cbn in *; dependent destruction x.
@@ -810,7 +803,7 @@ Proof.
       symmetry in Heqb. symmetry in Heqt. apply simpobs in Heqt.
       apply simpobs in Heqb. rewrite Heqb in Href. rewrite Heqt in Href.
       rewrite bind_vis in Href. punfold Href. red in Href. cbn in *.
-      inv Href. inj_existT. subst. inv H1. subst; inj_existT; subst.
+      inv Href. ddestruction. subst. inv H1. subst; ddestruction; subst.
       assert (A0 = A0); auto. destruct (classicT (A0 = A0) ); try contradiction.
       unfold eq_rect_r, eq_rect in *. remember (eq_sym e0) as He.
       dependent destruction He. cbn in *. discriminate.
@@ -832,7 +825,7 @@ Proof.
     unfold eq_rect_r, eq_rect in x. remember (eq_sym e1) as He.
     dependent destruction He. cbn in *. exists k0.
     rewrite Heqt in Href. rewrite bind_vis in Href. punfold Href. red in Href.
-    cbn in *. inv Href. inj_existT; subst. inv H1. inj_existT; subst. reflexivity.
+    cbn in *. inv Href. ddestruction; subst. inv H1. ddestruction; subst. reflexivity.
   - destruct (observe t) eqn : Heqt; cbn in *; dependent destruction x.
     + symmetry in Heqt. apply simpobs in Heqt. rewrite Heqt in Href. rewrite tau_eutt in Href.
       setoid_rewrite Heqt. setoid_rewrite tau_eutt. eapply IHHpeel; eauto.
@@ -880,7 +873,7 @@ Proof.
     apply vis_refine_peel in H1 as Hk.
     rewrite peel_cont_vis_eutt. apply IHcan_converge; auto.
     + rewrite bind_vis in HeuttEv. punfold HeuttEv. red in HeuttEv. cbn in *.
-      inv HeuttEv. inj_existT; subst. 
+      inv HeuttEv. ddestruction; subst.
       assert (RAnsRef E unit A (evans A ev ans) tt ev ans ); auto.
       apply H8 in H. pclearbot. auto.
     + destruct b. symmetry. auto.
@@ -1058,12 +1051,12 @@ Proof.
     destruct H as [ [B [k' [e1 Ht0] ] ] | [s Ht0] ].
     + rewrite Heqt in Href. rewrite tau_eutt in Href. 
       rewrite Ht0 in Href. rewrite bind_vis in Href.
-      pinversion Href. subst; inj_existT; subst.
+      pinversion Href. subst; ddestruction; subst.
       rewrite Ht0 in Hvis. rewrite bind_vis in Hvis. pinversion Hvis.
-      subst; inj_existT; subst. clear Heqt Heqb.
+      subst; ddestruction; subst. clear Heqt Heqb.
       punfold Ht0. red in Ht0. cbn in *.
       destruct e.
-      * inv H1. inj_existT; subst. cbn. constructor.
+      * inv H1. ddestruction; subst. cbn. constructor.
         eapply trace_prefix_vis_evans; eauto. 
       * eapply trace_prefix_vis_evempty; eauto.
     + rewrite Heqt in Href. rewrite Ht0 in Href.
@@ -1074,13 +1067,13 @@ Proof.
   - destruct e; cbn.
     + symmetry in Heqt. apply simpobs in Heqt. rewrite Heqt in Href.
       rewrite bind_vis in Href. symmetry in Heqb. apply simpobs in Heqb.
-      rewrite Heqb in Href. pinversion Href. subst; inj_existT; subst.
-      inversion H1. inj_existT; subst.
+      rewrite Heqb in Href. pinversion Href. subst; ddestruction; subst.
+      inversion H1. ddestruction; subst.
       unfold observe at 1. cbn. unfold peel_vis. assert (A = A); auto.
       destruct (classicT (A = A) ); try contradiction.
       unfold eq_rect_r, eq_rect. remember (eq_sym e) as He.
       dependent destruction He. cbn. constructor. right. eapply CIH.
-      inj_existT; subst.
+      ddestruction; subst.
       assert (RAnsRef E unit A (evans A ev ans) tt ev ans ); auto.
       apply H6 in H0. pclearbot. eauto.
     + constructor.
@@ -1135,7 +1128,7 @@ Proof.
   intros. rewrite bind_trigger in H0. apply trace_refine_vis in H0 as Hvis.
   destruct Hvis as [X [e' [k' Hbvis] ] ]. setoid_rewrite Hbvis.
   rewrite Hbvis in H0.
-  punfold H0. red in H0. cbn in *. inv H0. inj_existT. subst. inv H3; inj_existT; subst.
+  punfold H0. red in H0. cbn in *. inv H0. ddestruction. subst. inv H3; ddestruction; subst.
   - exists a. exists k'. split; try reflexivity. pclearbot.
     assert (RAnsRef E unit A (evans A e a) tt e a ); auto.
     apply H8 in H0. pclearbot. auto.

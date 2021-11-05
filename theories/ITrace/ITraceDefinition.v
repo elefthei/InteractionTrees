@@ -1,22 +1,3 @@
-From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
-     Morphisms
-     Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
-     Program.Equality
-     (* Logic.IndefiniteDescription *)
-.
-
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
-
 From ITree Require Import
      ITree
      ITreeFacts
@@ -53,7 +34,7 @@ Definition ev_list (E : Type -> Type) := list (EvAns E unit).
 Fixpoint ev_list_to_stream {E : Type -> Type} (l : ev_list E) : ev_stream E :=
   match l with
   | nil => Ret tt
-  | e :: t => Vis e (fun _ => ev_list_to_stream t) end.
+  | cons e t => Vis e (fun _ => ev_list_to_stream t) end.
 
 (*one append for traces and streams, get associativity for free from bind_bind*)
 Definition append {E R} (s : itrace E unit) (b : itrace E R) :=

@@ -3,6 +3,7 @@
 theories/Simple.v
 theories/ITree.v
 theories/ITreeFacts.v
+theories/Axioms.v
 
 theories/Basics/Tacs.v
 theories/Basics/Basics.v

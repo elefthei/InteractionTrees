@@ -1,23 +1,9 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
      Morphisms
-     Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
-     Program.Equality
-     (* Logic.IndefiniteDescription *)
 .
 
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
-
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
      ITrace.EuttEv
@@ -327,7 +313,7 @@ Proof.
     apply prefix_vis in Hbp as Hb2.
     destruct Hb2 as [k' Hk']. rewrite Hk' in Hbp.
     eapply left_vis_bp; eauto. destruct b. apply IHHconv.
-    punfold Hbp. red in Hbp. cbn in *. inversion Hbp. subst; inj_existT; subst.
+    punfold Hbp. red in Hbp. cbn in *. inversion Hbp. subst; ddestruction; subst.
     pclearbot. auto.
 Qed.
 
@@ -341,7 +327,7 @@ Proof.
   - constructor; auto. apply IHHbf. pstep_reverse. inv Hdiv. pclearbot. auto.
   - constructor; auto. 
   - constructor. intuition.
-  - pclearbot. constructor. intros. right. pclearbot. inv Hdiv. inj_existT; subst.
+  - pclearbot. constructor. intros. right. pclearbot. inv Hdiv. ddestruction; subst.
     pclearbot. destruct v. apply CIH; auto. apply H1.
 Qed.
 

@@ -1,10 +1,9 @@
 From Coq Require Import
      Morphisms
-     Setoid
-     Program.Equality
 .
 
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
      ITrace.ITraceDefinition
@@ -51,7 +50,7 @@ Proof.
   punfold Heutt. red in Heutt. induction Heutt; subst; auto.
   - inv Hforall. auto.
   - inv Hforall. pclearbot. constructor. right. eapply CIH; eauto.
-  - inv Hforall. inj_existT. subst. pclearbot.
+  - inv Hforall. ddestruction. subst. pclearbot.
     constructor; auto. intros. right. eapply CIH; eauto. apply H3.
   - apply IHHeutt. inv Hforall. pclearbot. punfold H0.
   - constructor. left. pfold. red. apply IHHeutt. auto.

@@ -1,9 +1,9 @@
 From Coq Require Import
      Morphisms
-     Program.Equality
 .
 
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
      Core.Divergence

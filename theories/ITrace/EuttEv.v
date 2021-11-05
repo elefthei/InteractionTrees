@@ -1,20 +1,9 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
      Morphisms
-     Setoid
-     RelationClasses
-     Program.Equality
 .
 
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
-
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
 .

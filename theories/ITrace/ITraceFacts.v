@@ -1,22 +1,8 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
-     Morphisms
-     Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Program.Equality
-     Logic.IndefiniteDescription
-.
-
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
+     Morphisms.
 
 From ITree Require Import
+     Axioms
      ITree
      ITreeFacts
      ITrace.EuttEv
@@ -30,8 +16,6 @@ From Paco Require Import paco.
 Import Monads.
 Import MonadNotation.
 Local Open Scope monad_scope.
-
-Ltac inj_existT := repeat lazymatch goal with | H : existT _ _ _ = _ |- _ => dependent destruction H end.
 
 Lemma classic_empty : forall (A : Type), ( exists e : A + (A -> void), True ).
 Proof.
@@ -67,13 +51,13 @@ Proof.
                                                                     contra_void.
     + pinversion H3.
     + destruct e; [ | contradiction ]. destruct b.
-      pinversion H3. inj_existT.
+      pinversion H3. ddestruction.
       enough (k tt ≈ k0 tt); try apply REL.
       rewrite H5. auto.
     + contradiction.
  - destruct e. destruct e0. destruct b. destruct b0.
    apply IHcan_converge. rewrite H in H2.
-   pinversion H2. inj_existT.
+   pinversion H2. ddestruction.
    subst. enough (k tt ≈ k0 tt); try apply REL.
    rewrite H4. auto; contra_void.
    + destruct b0.
@@ -101,7 +85,7 @@ Proof.
   - exists nil. auto.
   - destruct IHcan_converge as [l Hl]. unfold ev_list in l.
     inversion e. subst.
-    exists (e:: l). simpl. rewrite H.
+    exists (cons e l). simpl. rewrite H.
     destruct b. pfold. red. cbn. constructor.
     intros. destruct v. left. auto.
     subst. contradiction.
@@ -117,8 +101,8 @@ Proof.
     + constructor. inversion Hdiv. subst. right.
       pclearbot.
       eapply CIH; eauto.
-    + constructor. inversion Hdiv. subst. inj_existT.
-      subst. intros. right. inversion Hdiv. inj_existT.
+    + constructor. inversion Hdiv. subst. ddestruction.
+      subst. intros. right. inversion Hdiv. ddestruction.
       subst. pclearbot. eapply CIH; eauto. apply H1.
     + apply IHHt. inversion Hdiv. subst. pclearbot. punfold H0.
     + constructor. left. pfold. apply IHHt. auto.
@@ -129,8 +113,8 @@ Proof.
     + constructor. inversion Hdiv. subst. right.
       pclearbot.
       eapply CIH; eauto.
-    + constructor. inversion Hdiv. subst. inj_existT.
-      subst. intros. right. inversion Hdiv. subst. inj_existT.
+    + constructor. inversion Hdiv. subst. ddestruction.
+      subst. intros. right. inversion Hdiv. subst. ddestruction.
       subst. pclearbot. eapply CIH; eauto. apply H1.
     +  constructor. left. pfold. apply IHHt. auto. 
     +  apply IHHt. inversion Hdiv. subst. pclearbot. punfold H0.
@@ -195,7 +179,7 @@ Proof.
   - exists nil. cbn. rewrite H.
     pfold. red. cbn. constructor. auto.
   - destruct IHcan_converge as [log Hlog]. inversion e. subst.
-    exists (e :: log). cbn. rewrite append_vis. rewrite H.
+    exists (cons e log). cbn. rewrite append_vis. rewrite H.
     pfold. red. cbn. constructor. cbn. intros. destruct v.
     left. destruct b. apply Hlog. subst. contradiction.
 Qed.
@@ -249,7 +233,7 @@ Proof.
     + pinversion H.
   - destruct log2.
     + pinversion H.
-    + cbn in H. unfold append in H. pinversion H. cbn in *. inj_existT.
+    + cbn in H. unfold append in H. pinversion H. cbn in *. ddestruction.
       subst.
       enough (log1 = log2 /\ r1 = r2).
       { destruct H0. subst. auto. }
@@ -262,7 +246,7 @@ Proof.
   intros E R t r Hc Hd. induction Hc.
   - rewrite H in Hd. pinversion Hd.
   - apply IHHc. rewrite H in Hd. pinversion Hd.
-    inj_existT. subst.
+    ddestruction. subst.
     apply H1.
 Qed.
 
@@ -348,7 +332,7 @@ Proof.
       * constructor. rewrite <- x. eapply IHREL; eauto.
   - remember (VisF e k1) as ot1. hinduction H1 before CIH; intros; inv Heqot1.
     + constructor. eauto.
-    + inj_existT. constructor; auto. intros. apply H0 in H1.
+    + ddestruction. constructor; auto. intros. apply H0 in H1.
       right. pclearbot. eapply CIH; eauto; apply REL.
   - eapply IHeqitF; eauto. remember (TauF t0) as otf0.
     hinduction H1 before CIH; intros; dependent destruction Heqotf0; eauto.
@@ -396,7 +380,7 @@ Lemma trace_refine_vis_inv : forall (E : Type -> Type) (R A: Type) (e : E A) (a 
     trace_refine (Vis e k) (Vis (evans A e a) (fun _ => b))  -> trace_refine (k a) b .
 Proof.
   intros E R A e a. intros.
-  red in H. red. punfold H. red in H. inversion H. inj_existT.
+  red in H. red. punfold H. red in H. inversion H. ddestruction.
   subst. 
   assert (RAnsRef E unit A (evans A e a) tt e a); eauto.
   apply H7 in H0. pclearbot. auto.
@@ -407,7 +391,7 @@ Lemma trace_refine_vis_add : forall (E : Type -> Type) (R A: Type) (e : E A) (a 
     b ⊑ k a -> Vis (evans A e a) (fun _ => b) ⊑ Vis e k.
 Proof.
   intros. pfold. red. cbn. constructor; eauto.
-  intros. left. inversion H0. inj_existT.
+  intros. left. inversion H0. ddestruction.
   subst. auto.
 Qed.
 
@@ -447,7 +431,7 @@ Proof.
                    (classic_empty X)).
     destruct x as [x | f]; cbn.
     + constructor; eauto. intros. right. 
-      inversion H. inj_existT.
+      inversion H. ddestruction.
       subst. apply CIH.
     + constructor; auto. intros. contradiction. 
 Qed.
@@ -472,9 +456,9 @@ Proof.
     apply H0 in Hbk as Hbk0.
     rewrite Ht1 in Hbk. rewrite Ht2 in Hbk0.
     pinversion Hbk.
-    pinversion Hbk0. inj_existT.
+    pinversion Hbk0. ddestruction.
     subst.
-    inversion H10. inj_existT.
+    inversion H10. ddestruction.
     subst. constructor.
     intros. right. eapply CIH; eauto.
     intros. setoid_rewrite Ht1 in H0. setoid_rewrite Ht2 in H0.
@@ -492,8 +476,8 @@ Proof.
     }
     apply H0 in H as H1. unfold b in *. clear b.
     rewrite Ht1 in H. rewrite Ht2 in H1.
-    pinversion H. pinversion H1. inj_existT.
-    subst. inversion H12. inj_existT.
+    pinversion H. pinversion H1. ddestruction.
+    subst. inversion H12. ddestruction.
     constructor.
     intros. right. eapply CIH.
     intros. setoid_rewrite Ht1 in H0. setoid_rewrite Ht2 in H0.
@@ -560,8 +544,8 @@ Proof.
   - rewrite H in H1. apply trace_refine_vis_l in H1 as Ht0.
     destruct Ht0 as [X [e0 [k0 Ht0] ] ].
     rewrite Ht0 in H1. pinversion H1. subst.
-    inj_existT. subst. rewrite Ht0. 
-    inversion H4; subst; inj_existT; subst; try contradiction.
+    ddestruction. subst. rewrite Ht0.
+    inversion H4; subst; ddestruction; subst; try contradiction.
     eapply conv_vis; try reflexivity. Unshelve. 2 : exact a.
     apply IHcan_converge. pclearbot.
     specialize (H9 tt a). assert (RAnsRef E unit X (evans X e0 a) tt e0 a).
@@ -581,8 +565,8 @@ Proof.
   - eapply IHeuttEvF; auto. rewrite <- x in H0. inv H0.
     pclearbot. punfold H2.
   - rewrite <- x0. rewrite <- x in H0. constructor. inv H0.
-    inj_existT. subst. intros. right. pclearbot. 
-    inversion H; subst; inj_existT; try contradiction. destruct b0.
+    ddestruction. subst. intros. right. pclearbot.
+    inversion H; subst; ddestruction; try contradiction. destruct b0.
     eapply CIH; try apply H3.
     specialize (H1 tt a). assert (RAnsRef _ _ _ (evans B e2 a) tt e2 a ).
     constructor. apply H1 in H0. unfold id in H0.
@@ -600,9 +584,9 @@ Proof.
     rewrite H in H2. apply trace_refine_vis_l in H2 as Ht.
     destruct Ht as [X [e0 [k0 Ht] ] ].
     rewrite Ht in H2. punfold H2. red in H2. cbn in H2. inversion H2; subst.
-    inj_existT. subst. pclearbot.
-    inversion H5; inj_existT; subst; try contradiction.
-    inj_existT. subst. rewrite H. rewrite Ht.
+    ddestruction. subst. pclearbot.
+    inversion H5; ddestruction; subst; try contradiction.
+    ddestruction. subst. rewrite H. rewrite Ht.
     pfold. red. cbn. constructor; auto.
     intros. apply H10 in H3. pclearbot. left. 
     destruct a0. destruct b. apply IHcan_converge. auto.
@@ -627,7 +611,7 @@ Proof.
     eapply IHeuttEvF; eauto.
   - unfold observe. cbn. rewrite <- x0. rewrite <- x. cbn. constructor; auto.
     intros.
-    rewrite <- x0 in H0. inv H0. inj_existT. subst. pclearbot.
+    rewrite <- x0 in H0. inv H0. ddestruction. subst. pclearbot.
     apply H1 in H2. right. eapply CIH; eauto; try apply H4.
     unfold id in H2. pclearbot. auto.
 Qed.
@@ -774,9 +758,9 @@ Proof.
     apply trace_refine_vis_l in Hrefb as Hvis. destruct Hvis as [X [e' [k' Hvis ] ] ].
     rewrite Hvis in Hrefbind. rewrite bind_vis in Hrefbind.
     punfold Hrefbind. red in Hrefbind. cbn in Hrefbind. inv Hrefbind.
-    inj_existT. inv H2. inj_existT; subst.
+    ddestruction. inv H2. ddestruction; subst.
     rewrite Hvis in Hrefb. punfold Hrefb. red in Hrefb. cbn in Hrefb. inv Hrefb.
-    inj_existT.
+    ddestruction.
     assert (RAnsRef E unit A (evans _ e' ans) tt e' ans ); try (constructor; auto; fail).
     specialize (IHHconv (k' ans) ). apply IHHconv.
     + apply H8 in H0. pclearbot. destruct b. auto.
@@ -792,13 +776,13 @@ Proof.
   induction log; cbn; intros.
   - simpl in H. setoid_rewrite bind_ret_l in H. rewrite H.
     apply can_converge_append. apply can_converge_list_to_stream.
-  - assert ((Vis a0 (fun _ => ev_list_to_stream log)) ≈ ev_list_to_stream (a0 :: log) )%itree.
+  - assert ((Vis a0 (fun _ => ev_list_to_stream log)) ≈ ev_list_to_stream (cons a0 log) )%itree.
     { cbn. reflexivity. }
     rewrite H0 in H.
     destruct log' as [ | h t ].
     + setoid_rewrite bind_ret_l in H. simpl in H. pinversion H.
     + simpl in H. unfold append in H. repeat rewrite bind_vis in H. pinversion H.
-      inj_existT; subst.
+      ddestruction; subst.
       assert (ev_list_to_stream log ++ b ≈ ev_list_to_stream t ++ Ret a).
       { apply REL. apply tt. }
       eapply IHlog; eauto.
@@ -811,6 +795,6 @@ Proof.
   intros E A log b' Hdiv. induction log.
   - cbn in Hdiv. setoid_rewrite bind_ret_l in Hdiv. auto.
   - apply IHlog. simpl in Hdiv. unfold append in Hdiv.
-    rewrite bind_vis in Hdiv. pinversion Hdiv. inj_existT. subst. apply H0.
+    rewrite bind_vis in Hdiv. pinversion Hdiv. ddestruction. subst. apply H0.
     apply tt.
 Qed.
