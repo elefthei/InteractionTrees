@@ -11,7 +11,7 @@ From ITree Require Import
      ITrace.ITraceDefinition
      ITrace.ITraceFacts
      ITrace.EuttDiv
-     ITrace.TracePrefix
+     ITrace.ITracePrefix
 .
 
 

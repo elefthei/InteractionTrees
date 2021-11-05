@@ -75,6 +75,6 @@ theories/ITrace/EuttEv.v
 theories/ITrace/ITraceDefinition.v
 theories/ITrace/ITraceFacts.v
 theories/ITrace/EuttDiv.v
-theories/ITrace/TracePrefix.v
+theories/ITrace/ITracePrefix.v
 theories/ITrace/ITraceBind.v
 theories/ITrace/ITracePreds.v
