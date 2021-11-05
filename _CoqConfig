@@ -37,6 +37,7 @@ theories/Eq/Eq.v
 theories/Eq/UpToTaus.v
 theories/Eq/SimUpToTaus.v
 theories/Eq/EqAxiom.v
+theories/Eq/EuttExtras.v
 
 theories/Props/Leaf.v
 theories/Props/Finite.v
