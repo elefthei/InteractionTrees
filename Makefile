@@ -9,7 +9,9 @@ include common.mk
 all:
 	# Build the library before tests
 	$(MAKE) coq
+	$(MAKE) test
 	$(MAKE) hoare_example
+	$(MAKE) tutorial
 
 install: Makefile.coq coq
 	$(MAKE) -f $< $@
