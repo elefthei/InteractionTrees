@@ -1,27 +1,12 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
      Morphisms
-     Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
      Program.Equality
 .
-
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
 
 From ITree Require Import
      ITree
      ITreeFacts
      Core.Divergence
-     (* Dijkstra.PureITreeBasics
-     Dijkstra.DelaySpecMonad *)
      ITrace.ITraceDefinition
      ITrace.ITraceFacts
 .
@@ -91,7 +76,7 @@ Proof.
     intros. right. apply CIH; auto.
     specialize (itree_eta ta) as Hta. rewrite <- x0 in Hta.
     rewrite Hta in Hdiv. pinversion Hdiv.
-    apply inj_pair2 in H2. subst. apply H0.
+    dependent destruction H2. apply H0.
   - rewrite <- x. constructor; auto. eapply IHHeutt; eauto.
     assert (t1 ≈ ta).
     { specialize (itree_eta ta) as Hta. rewrite <- x in Hta.

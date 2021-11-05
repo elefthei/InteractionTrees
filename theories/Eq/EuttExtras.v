@@ -8,8 +8,16 @@ From Coq Require Import
   Basics
   RelationClasses.
 
+From Paco Require Import paco.
+
 From ITree Require Import
   Core.ITreeDefinition Eq.Eq.
+
+Lemma paco2_eqit_refl : forall E R r (t : itree E R), paco2 (eqit_ eq true true id) r t t.
+Proof.
+  intros. eapply paco2_mon with (r := bot2); intuition.
+  enough (t ≈ t); auto. reflexivity.
+Qed.
 
 Lemma eutt_subrel : forall (E : Type -> Type) (A B : Type) (R1 R2 : A -> B -> Prop)
                            (ta : itree E A) (tb : itree E B),

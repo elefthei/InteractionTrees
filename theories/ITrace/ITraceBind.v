@@ -44,6 +44,7 @@ Axiom classicT : forall (P : Prop), {P} + {~ P}.
 Definition peel_vis {E R S A B} (e0 : E A) (a : A) (k0 : unit -> itrace E R)
            (e1 : E B) (k1 : B -> itree E S) 
            (peel : itrace' E R -> itree' E S -> itrace E S) : itrace E S.
+Proof.
 destruct (classicT (A = B) ).
 - subst. apply (Vis (evans _ e0 a) (fun _ => peel (observe (k0 tt)) (observe (k1 a) ) ) ).
 - apply ITree.spin.
@@ -70,6 +71,7 @@ Definition peel {E R S} (b : itrace E R) (t : itree E S) : itrace E S :=
 Definition peel_cont_vis {E R S A B} (e0 : E A) (a : A) (k0 : unit -> itrace E R)
            (e1 : E B) (k1 : B -> itree E S) 
            (peel : itrace' E R -> itree' E S -> itrace E R) : itrace E R.
+Proof.
 destruct (classicT (A = B) ).
 - subst. apply (Tau (peel (observe (k0 tt)) (observe (k1 a) ) ) ).
 - apply ITree.spin.
@@ -200,21 +202,18 @@ Proof.
     + rewrite <- x0.
       symmetry in Heq. apply simpobs in Heq. apply simpobs in x.
       rewrite Heq in x. rewrite bind_vis in x. pinversion x.
-      subst. inj_existT; subst.
-      inversion H; subst; inj_existT; subst.
+      inj_existT. inversion H; inj_existT.
       * unfold observe. cbn. unfold peel_vis.
-        assert (B = B). auto.
         destruct (classicT (B = B) ); try contradiction.
         unfold eq_rect_r, eq_rect. 
-        remember (eq_sym e) as He. clear HeqHe.
+        remember (eq_sym _) as He. clear HeqHe.
         dependent destruction He. cbn. constructor; eauto.
-        intros. inversion H2. subst; inj_existT; subst.
-        apply H0 in H2. pclearbot. unfold id. right. eapply CIH.
-        enough (k2 b0 ≈ ITree.bind (k b0) f ).
-        { rewrite <- H3. auto. }
-        red in x1. cbn in x1. inversion x1. subst; inj_existT; subst.
-        symmetry. pclearbot. specialize ( REL0 b0).
-        apply eq_sub_eutt. auto.
+        intros. inversion H1. inj_existT.
+        apply H0 in H1. pclearbot. unfold id. right. eapply CIH.
+        red in x1. cbn in x1. inversion x1. inj_existT.
+        red in H0. specialize (H0 tt a (rar _ _ _)).
+        specialize (REL0 a). pclearbot.
+        rewrite REL0. apply H0.
       * cbn. constructor; eauto. intros. contradiction.
 Qed.
 
@@ -718,8 +717,8 @@ Proof.
   assert (A = A). auto.
   destruct (classicT (A = A) ); try contradiction. unfold eq_rect_r, eq_rect in Hpeel.
   remember (eq_sym e0) as He. dependent destruction He. cbn in *.
-  clear HeqHe e0 H. pfold. red. cbn. inv Hpeel. inj_existT. subst.
-  clear H. pclearbot. specialize (REL tt).
+  clear HeqHe e0 H. pfold. red. cbn. inv Hpeel. inj_existT.
+  pclearbot. specialize (REL tt).
   assert (peel_ (observe (k1 tt)) (observe (k2 a)) ≈ k3 tt ). auto.
   symmetry in H. punfold H.
 Qed.

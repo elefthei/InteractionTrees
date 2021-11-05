@@ -1,35 +1,16 @@
 From Coq Require Import
-     Arith.PeanoNat
-     Lists.List
-     Strings.String
      Morphisms
      Setoid
-     RelationClasses
-     Logic.Classical_Prop
-     Logic.EqdepFacts
      Program.Equality
 .
-
-From ExtLib Require Import
-     Data.String
-     Structures.Monad
-     Structures.Traversable
-     Data.List.
 
 From ITree Require Import
      ITree
      ITreeFacts
-     Events.MapDefault
-     Events.State
-     Events.StateFacts
-     Core.Divergence
      ITrace.ITraceDefinition
      ITrace.ITraceFacts
      ITrace.ITraceBind
-     ITrace.EuttDiv
-   (*  Simple *)
 .
-
 
 From Paco Require Import paco.
 
@@ -183,7 +164,7 @@ Proof.
   - apply IHHsm. pstep_reverse. assert (Tau t ≈ t2); auto.
     rewrite tau_eutt in H. auto.
   - remember (VisF (evans A e a) k ) as ot1. induction Heutt; subst; auto; try discriminate.
-    injection Heqot1; intros; subst. apply inj_pair2 in H2. apply inj_pair2 in H1.
+    injection Heqot1; intros; subst. dependent destruction H1.
     subst. constructor; auto. right. pclearbot. eapply CIH; eauto.
     destruct H0; tauto.
 Qed.
