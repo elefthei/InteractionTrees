@@ -4,20 +4,20 @@
 
 (* begin hide *)
 From ExtLib Require Import
-     Structures.Functor
-     Structures.Monad.
+  Data.Monads.StateMonad
+  Structures.Functor
+  Structures.Monad.
 
 From ITree Require Import
-     Basics.Basics
-     Basics.CategoryOps
-     Basics.CategoryKleisli
-     Core.ITreeDefinition
-     Indexed.Function
-     Indexed.Sum
-     Core.Subevent
-     Interp.Interp.
-
-Import ITree.Basics.Basics.Monads.
+  Basics.Basics
+  Basics.MonadState
+  Basics.CategoryOps
+  Basics.CategoryKleisli
+  Core.ITreeDefinition
+  Indexed.Function
+  Indexed.Sum
+  Core.Subevent
+  Interp.Interp.
 
 Local Open Scope itree_scope.
 (* end hide *)
@@ -26,6 +26,7 @@ Local Open Scope itree_scope.
    [E ~> state S] define stateful itree morphisms
    [itree E ~> stateT S (itree F)]. *)
 
+Global Existing Instance Monad_stateT.
 Definition interp_state {E M S}
            {FM : Functor M} {MM : Monad M}
            {IM : MonadIter M} (h : E ~> stateT S M) :
@@ -45,21 +46,21 @@ Section State.
   Definition put {E} `{stateE -< E} : S -> itree E unit := embed Put.
 
   Definition h_state {E} : stateE ~> stateT S (itree E) :=
-    fun _ e s =>
+    fun _ e => mkStateT (fun s =>
       match e with
       | Get => Ret (s, s)
-      | Put s' => Ret (s', tt)
-      end.
+      | Put s' => Ret (tt, s')
+      end).
 
   (* SAZ: this is the instance for the hypothetical "Trigger E M" typeclass.
     Class Trigger E M := trigger : E ~> M 
   *)
   Definition pure_state {S E} : E ~> stateT S (itree E)
-    := fun _ e s => Vis e (fun x => Ret (s, x)).
+    := fun _ e => mkStateT (fun s => Vis e (fun x => Ret (x, s))).
 
   Definition run_state {E}
     : itree (stateE +' E) ~> stateT S (itree E)
-    := interp_state (case_ h_state pure_state).
+    := interp_state (case_ h_state (@pure_state ).
 
 End State.
 

@@ -2,7 +2,9 @@ From Coq Require Import
      Morphisms.
 
 From ExtLib Require Import
-     Structures.Monad.
+  Data.Monads.StateMonad
+  Structures.MonadState
+  Structures.Monad.
 
 From Paco Require Import paco.
 
@@ -12,10 +14,10 @@ From ITree Require Import
      Props.Infinite.
 
 From ITree.Extra Require Import
-     Dijkstra.DijkstraMonad
-     Dijkstra.PureITreeBasics
-     Dijkstra.IterRel
-     Dijkstra.DelaySpecMonad.
+  Dijkstra.DijkstraMonad
+  Dijkstra.PureITreeBasics
+  Dijkstra.IterRel
+  Dijkstra.DelaySpecMonad.
 
 Import Monads.
 Import MonadNotation.
